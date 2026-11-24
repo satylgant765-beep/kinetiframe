@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>Temirlan Animation Studio</title>
+  <meta name="description" content="2D-анимация прямо в браузере телефона: рисуйте, добавляйте персонажей, анимируйте по кадрам и экспортируйте видео.">
+  <meta name="theme-color" content="#15171e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand" aria-label="Temirlan Animation Studio">
+        <img src="icons/icon.svg" alt="" width="32" height="32">
+        <div class="brand__text"><strong>Temirlan</strong><span>Animation Studio</span></div>
+      </div>
+      <input id="project-name" class="project-name" aria-label="Название проекта" maxlength="60" autocomplete="off">
+      <div class="topbar__actions">
+        <button id="undo-btn" class="icon-btn" title="Отменить (Ctrl+Z)" aria-label="Отменить"></button>
+        <button id="redo-btn" class="icon-btn" title="Повторить (Ctrl+Y)" aria-label="Повторить"></button>
+        <button id="menu-btn" class="icon-btn" title="Проект: сохранить, открыть, экспорт" aria-label="Меню проекта"></button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <nav id="toolbar" class="toolbar" aria-label="Панель инструментов"></nav>
+      <main id="stage" class="stage">
+        <div id="context-bar" class="context-bar" role="toolbar" aria-label="Действия с объектом" hidden></div>
+        <div id="zoom-controls" class="zoom-controls"></div>
+      </main>
+      <aside class="side">
+        <section id="props-panel" class="panel" aria-label="Свойства" aria-hidden="true"></section>
+        <section id="layers-panel" class="panel" aria-label="Слои" aria-hidden="true"></section>
+      </aside>
+    </div>
+
+    <footer id="timeline" class="timeline" aria-label="Таймлайн"></footer>
+  </div>
+
+  <div id="backdrop" class="backdrop"></div>
+  <section id="insert-sheet" class="sheet" aria-label="Добавить" aria-hidden="true"></section>
+  <section id="tween-sheet" class="sheet" aria-label="Плавное движение" aria-hidden="true"></section>
+  <section id="sound-sheet" class="sheet" aria-label="Звук" aria-hidden="true"></section>
+  <section id="project-sheet" class="sheet" aria-label="Проект" aria-hidden="true"></section>
+  <section id="export-dialog" class="sheet sheet--dialog" role="dialog" aria-label="Экспорт видео" aria-hidden="true"></section>
+
+  <noscript>Для работы Temirlan Animation Studio нужен JavaScript.</noscript>
+</body>
+</html>
