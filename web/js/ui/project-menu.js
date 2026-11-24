@@ -2,6 +2,7 @@
 
 import { icon } from './icons.js';
 import { createProject } from '../core/project.js';
+import { createDemoProject } from '../core/demo.js';
 import {
   saveProject, listProjects, loadProject, deleteProject, exportProjectFile, readProjectFile, downloadBlob, fileName,
 } from '../services/storage.js';
@@ -38,6 +39,7 @@ export class ProjectMenu {
           <button class="chip" data-new="16:9">16:9 Горизонтальный</button>
           <button class="chip" data-new="9:16">9:16 Вертикальный</button>
           <button class="chip" data-new="1:1">1:1 Квадрат</button>
+          <button class="chip" data-new="demo">Пример анимации</button>
         </div>
         <h3 class="sheet__title">Мои проекты</h3>
         <ul class="projects" data-projects></ul>
@@ -104,7 +106,7 @@ export class ProjectMenu {
         this.el.querySelector('[data-act="install"]').hidden = true;
       } else if (newAspect) {
         await saveProject(store.project);
-        store.load(createProject({ aspect: newAspect }));
+        store.load(newAspect === 'demo' ? createDemoProject() : createProject({ aspect: newAspect }));
         await saveProject(store.project);
         closeSheet(this.el);
         toast('Создан новый проект. Предыдущий сохранён в «Мои проекты».');

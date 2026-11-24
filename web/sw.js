@@ -1,6 +1,6 @@
 // Offline support: serve the app shell from the cache, update it in the background.
 // Bump VERSION whenever files change so phones pick up the new release.
-const VERSION = 'tas-v1';
+const VERSION = 'tas-v2';
 const SHELL = [
   './',
   './index.html',
@@ -14,9 +14,12 @@ const SHELL = [
   './js/core/objects.js',
   './js/core/store.js',
   './js/core/player.js',
+  './js/core/tween.js',
+  './js/core/demo.js',
   './js/render/renderer.js',
   './js/render/shapes.js',
   './js/render/characters.js',
+  './js/render/scenes.js',
   './js/services/storage.js',
   './js/services/video-export.js',
   './js/ui/icons.js',
@@ -31,6 +34,7 @@ const SHELL = [
   './js/ui/context-bar.js',
   './js/ui/project-menu.js',
   './js/ui/export-dialog.js',
+  './js/ui/tween-sheet.js',
 ];
 
 self.addEventListener('install', (event) => {

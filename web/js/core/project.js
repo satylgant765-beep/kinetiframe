@@ -67,8 +67,15 @@ export function cloneFrame(frame) {
   return { id: uid('frame'), cells };
 }
 
+/** Inserts an empty frame after `afterIndex`. Background scenes are carried over. */
 export function addFrame(project, afterIndex) {
   const frame = createFrame(project.layers);
+  const source = project.frames[afterIndex];
+  if (source) {
+    for (const layer of project.layers) {
+      frame.cells[layer.id] = (source.cells[layer.id] || []).filter((o) => o.type === 'scene').map((o) => structuredClone(o));
+    }
+  }
   project.frames.splice(afterIndex + 1, 0, frame);
   return afterIndex + 1;
 }

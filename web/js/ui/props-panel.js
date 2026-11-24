@@ -10,7 +10,7 @@ const PALETTE = [
   '#51cf66', '#2f9e44', '#22b8cf', '#4dabf7', '#1c7ed6', '#7950f2', '#f783ac', '#8d5524',
 ];
 const MOOD_LABELS = { happy: 'Радость', surprised: 'Удивление', sad: 'Грусть', angry: 'Злость' };
-const TYPE_LABELS = { stroke: 'Линия', shape: 'Фигура', character: 'Персонаж' };
+const TYPE_LABELS = { stroke: 'Линия', shape: 'Фигура', character: 'Персонаж', scene: 'Фон' };
 
 export class PropsPanel {
   constructor(store, el) {

@@ -8,7 +8,8 @@ const FPS_OPTIONS = [4, 6, 8, 12, 15, 24, 30];
 const THUMB_HEIGHT = 52;
 
 export class Timeline {
-  constructor(store, el, player) {
+  constructor(store, el, player, { tweenSheet } = {}) {
+    this.tweenSheet = tweenSheet;
     this.store = store;
     this.el = el;
     this.player = player;
@@ -28,6 +29,7 @@ export class Timeline {
           <button class="icon-btn" data-act="del" title="Удалить кадр">${icon('trash')}</button>
           <button class="icon-btn" data-act="left" title="Сдвинуть кадр влево">${icon('left')}</button>
           <button class="icon-btn" data-act="right" title="Сдвинуть кадр вправо">${icon('right')}</button>
+          <button class="icon-btn" data-act="tween" title="Плавное движение до следующего кадра">${icon('tween')}</button>
         </div>
         <div class="timeline__group">
           <button class="icon-btn" data-act="onion" aria-pressed="false" title="Калька: показать предыдущий кадр">${icon('onion')}</button>
@@ -94,6 +96,7 @@ export class Timeline {
       case 'del': frameOp((p) => deleteFrame(p, i)); break;
       case 'left': frameOp((p) => moveFrame(p, i, -1)); break;
       case 'right': frameOp((p) => moveFrame(p, i, 1)); break;
+      case 'tween': this.tweenSheet?.open(); break;
       case 'onion': store.setUI({ onion: !store.ui.onion }); break;
       case 'loop': store.setUI({ loop: !store.ui.loop }); break;
       default:

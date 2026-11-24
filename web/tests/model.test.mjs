@@ -5,6 +5,9 @@ import {
   createProject, addFrame, duplicateFrame, deleteFrame, moveFrame, addLayer, deleteLayer, moveLayer,
   getCell, findObject, serialize, deserialize,
 } from '../js/core/project.js';
+import { addInbetweens, lerpAngle, lerpColor, EASINGS } from '../js/core/tween.js';
+import { createDemoProject } from '../js/core/demo.js';
+import { createScene } from '../js/core/objects.js';
 import { createStroke, createShape, createCharacter, hitTest, toLocal, toWorld } from '../js/core/objects.js';
 
 test('new project has one frame and two layers', () => {
@@ -69,4 +72,56 @@ test('local and world transforms are inverse', () => {
   const l = toLocal(o, w.x, w.y);
   assert.ok(Math.abs(l.x - 12) < 1e-9 && Math.abs(l.y + 7) < 1e-9);
   assert.ok(hitTest(o, 200, 100));
+});
+
+test('in-betweens interpolate matched objects', () => {
+  const p = createProject();
+  const layer = p.layers[1].id;
+  const c = createCharacter('cat', 0, 0);
+  getCell(p, 0, layer).push(c);
+  duplicateFrame(p, 0);
+  Object.assign(p.frames[1].cells[layer][0], { x: 100, rotation: 1, mood: 'sad', color: '#ffffff' });
+  p.frames[0].cells[layer][0].color = '#000000';
+  assert.equal(addInbetweens(p, 0, 3, 'linear'), 3);
+  assert.equal(p.frames.length, 5);
+  const xs = p.frames.map((f) => f.cells[layer][0].x);
+  assert.deepEqual(xs, [0, 25, 50, 75, 100]);
+  assert.equal(p.frames[1].cells[layer][0].mood, 'happy');
+  assert.equal(p.frames[3].cells[layer][0].mood, 'sad');
+  assert.equal(p.frames[2].cells[layer][0].color, '#808080');
+  assert.equal(addInbetweens(p, 4, 2), 0, 'no next frame');
+});
+
+test('unmatched objects swap halfway', () => {
+  const p = createProject();
+  const layer = p.layers[1].id;
+  getCell(p, 0, layer).push(createCharacter('cat', 0, 0));
+  addFrame(p, 0);
+  getCell(p, 1, layer).push(createCharacter('dog', 0, 0));
+  addInbetweens(p, 0, 3, 'linear');
+  assert.deepEqual(p.frames.map((f) => f.cells[layer].map((o) => o.kind).join()), ['cat', 'cat', 'dog', 'dog', 'dog']);
+});
+
+test('angles take the short way and easings end at 0 and 1', () => {
+  assert.ok(Math.abs(lerpAngle(3, -3, 0.5) - Math.PI) < 1e-9);
+  assert.equal(lerpColor('#ff0000', 'none', 0.2), '#ff0000');
+  for (const [name, fn] of Object.entries(EASINGS)) {
+    assert.ok(Math.abs(fn(0)) < 1e-9 && Math.abs(fn(1) - 1) < 1e-9, name);
+  }
+});
+
+test('new frames keep the background scene', () => {
+  const p = createProject();
+  getCell(p, 0, p.layers[0].id).push(createScene('sea', p.width, p.height));
+  getCell(p, 0, p.layers[1].id).push(createCharacter('cat', 0, 0));
+  addFrame(p, 0);
+  assert.equal(p.frames[1].cells[p.layers[0].id][0].kind, 'sea');
+  assert.equal(p.frames[1].cells[p.layers[1].id].length, 0);
+});
+
+test('sample project is valid and round-trips', () => {
+  const demo = createDemoProject();
+  assert.equal(demo.frames.length, 21);
+  const back = deserialize(serialize(demo));
+  assert.equal(back.frames.length, 21);
 });

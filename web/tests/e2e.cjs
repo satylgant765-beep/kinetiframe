@@ -29,6 +29,17 @@ const shots = process.argv[3];
   await page.goto(url);
   await page.waitForFunction(() => document.body.classList.contains('is-ready'));
   await shot('01-start');
+
+  await step('first launch opens the sample animation', async () => {
+    const s = await state();
+    assert.ok(s.frames > 10, `demo frames: ${s.frames}`);
+    assert.equal(await page.evaluate(() => window.tas.store.project.frames[0].cells[window.tas.store.project.layers[0].id][0].type), 'scene');
+    await page.click('#menu-btn');
+    await page.waitForTimeout(300);
+    await page.click('#project-sheet [data-new="16:9"]');
+    await page.waitForTimeout(300);
+    assert.equal((await state()).frames, 1);
+  });
   const box = await page.locator('.stage__canvas').boundingBox();
   const cx = box.x + box.width / 2;
   const cy = box.y + box.height / 2;
@@ -138,6 +149,36 @@ const shots = process.argv[3];
     assert.equal((await state()).selected.kind, 'star');
   });
 
+  await step('background scenes and new characters', async () => {
+    await page.click('[data-open="insert"]');
+    await page.waitForTimeout(300);
+    assert.equal(await page.locator('[data-character]').count(), 8);
+    assert.equal(await page.locator('[data-scene]').count(), 6);
+    await page.click('[data-scene="city"]');
+    await page.waitForTimeout(200);
+    const bg = await page.evaluate(() => {
+      const p = window.tas.store.project;
+      return p.frames[0].cells[p.layers[0].id].map((o) => o.type + ':' + (o.kind || ''));
+    });
+    assert.deepEqual(bg, ['scene:city']);
+    await page.click('[data-open="insert"]');
+    await page.waitForTimeout(300);
+    await page.click('[data-scene="night"]');
+    await page.waitForTimeout(200);
+    const bg2 = await page.evaluate(() => {
+      const p = window.tas.store.project;
+      return p.frames[0].cells[p.layers[0].id].map((o) => o.kind);
+    });
+    assert.deepEqual(bg2, ['night'], 'a new scene replaces the old one');
+    await page.click('[data-open="insert"]');
+    await page.waitForTimeout(300);
+    await page.click('[data-character="alien"]');
+    await page.waitForTimeout(200);
+    assert.equal((await state()).selected.kind, 'alien');
+    await shot('04b-scene');
+    await page.click('#context-bar [data-act="delete"]');
+  });
+
   await step('timeline: duplicate frames and move objects', async () => {
     for (let i = 0; i < 3; i++) {
       await page.click('[data-act="dup"]:not(#context-bar *)');
@@ -161,6 +202,31 @@ const shots = process.argv[3];
     await page.selectOption('[data-fps]', '8');
     assert.equal(await page.evaluate(() => window.tas.store.project.fps), 8);
     await shot('05-timeline');
+  });
+
+  await step('smooth movement: in-between frames', async () => {
+    await page.click('.frame-thumb[data-frame="2"]');
+    const before = await page.evaluate(() => {
+      const { store } = window.tas;
+      const a = store.project.frames[2].cells[store.ui.layerId].find((o) => o.type === 'character');
+      const b = store.project.frames[3].cells[store.ui.layerId].find((o) => o.id === a.id);
+      return { id: a.id, ax: a.x, bx: b.x, frames: store.project.frames.length };
+    });
+    await page.click('.timeline [data-act="tween"]');
+    await page.waitForTimeout(300);
+    await page.fill('#tween-sheet [data-count]', '3');
+    await page.click('#tween-sheet [data-easing="linear"]');
+    await shot('05b-tween');
+    await page.click('#tween-sheet [data-act="create"]');
+    const after = await page.evaluate((id) => {
+      const { store } = window.tas;
+      return { frames: store.project.frames.length, xs: [2, 3, 4, 5, 6].map((i) => store.project.frames[i].cells[store.ui.layerId].find((o) => o.id === id).x) };
+    }, before.id);
+    assert.equal(after.frames, before.frames + 3);
+    assert.equal(after.xs[0], before.ax);
+    assert.equal(after.xs[4], before.bx);
+    assert.ok(Math.abs(after.xs[2] - (before.ax + before.bx) / 2) < 0.001, `midpoint ${after.xs[2]}`);
+    await page.click('.timeline [data-act="first"]');
   });
 
   await step('play and pause', async () => {
@@ -210,7 +276,7 @@ const shots = process.argv[3];
     await page.reload();
     await page.waitForFunction(() => document.body.classList.contains('is-ready'));
     const p = await page.evaluate(() => ({ name: window.tas.store.project.name, frames: window.tas.store.project.frames.length }));
-    assert.deepEqual(p, { name: 'Тестовый мульт', frames: 4 });
+    assert.deepEqual(p, { name: 'Тестовый мульт', frames: 7 });
   });
 
   await step('download and re-import a project file', async () => {
@@ -225,7 +291,7 @@ const shots = process.argv[3];
     await page.waitForTimeout(300);
     await page.setInputFiles('[data-import]', file);
     await page.waitForTimeout(500);
-    assert.equal(await page.evaluate(() => window.tas.store.project.frames.length), 4);
+    assert.equal(await page.evaluate(() => window.tas.store.project.frames.length), 7);
   });
 
   await step('export video', async () => {

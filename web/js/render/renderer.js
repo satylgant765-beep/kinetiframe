@@ -2,6 +2,7 @@
 
 import { drawStroke, drawShape } from './shapes.js';
 import { drawCharacter } from './characters.js';
+import { drawScene } from './scenes.js';
 
 export function drawObject(ctx, obj) {
   ctx.save();
@@ -12,6 +13,7 @@ export function drawObject(ctx, obj) {
   if (obj.type === 'stroke') drawStroke(ctx, obj);
   else if (obj.type === 'shape') drawShape(ctx, obj);
   else if (obj.type === 'character') drawCharacter(ctx, obj);
+  else if (obj.type === 'scene') drawScene(ctx, obj);
   ctx.restore();
 }
 

@@ -5,7 +5,7 @@
 import { uid } from './project.js';
 
 export const SHAPES = ['rect', 'roundRect', 'ellipse', 'triangle', 'star', 'heart', 'arrow', 'line'];
-export const CHARACTERS = ['cat', 'robot', 'kid', 'monster', 'bird'];
+export const CHARACTERS = ['cat', 'dog', 'kid', 'girl', 'robot', 'monster', 'bird', 'alien'];
 export const MOODS = ['happy', 'surprised', 'sad', 'angry'];
 
 function base(type, x, y) {
@@ -30,10 +30,15 @@ export function createShape(kind, x, y, { fill, stroke, strokeWidth }) {
   return { ...base('shape', x, y), kind, w: size[0], h: size[1], fill, stroke, strokeWidth };
 }
 
-export const CHARACTER_COLORS = { cat: '#ff9f43', robot: '#7aa2f7', kid: '#4dabf7', monster: '#7bd88f', bird: '#ff6b81' };
+export const CHARACTER_COLORS = { cat: '#ff9f43', robot: '#7aa2f7', kid: '#4dabf7', monster: '#7bd88f', bird: '#ff6b81', dog: '#e8b07a', girl: '#f783ac', alien: '#94d82d' };
 
 export function createCharacter(kind, x, y) {
   return { ...base('character', x, y), kind, w: 200, h: 260, color: CHARACTER_COLORS[kind] || '#ff9f43', mood: 'happy' };
+}
+
+/** A full-size background scene centred on the stage. */
+export function createScene(kind, width, height) {
+  return { ...base('scene', width / 2, height / 2), kind, w: width, h: height };
 }
 
 /** Local bounding box of an object: { x, y, w, h } with (0,0) at the object's centre. */

@@ -6,8 +6,11 @@ It is a separate web project inside this repository and does not touch the Andro
 ## Features (v1)
 
 - Drawing canvas with touch, pen and mouse input; smooth brush and a real eraser that cuts strokes
-- Shapes (rectangle, rounded, circle, triangle, star, heart, arrow, line) and five cartoon characters
-  (cat, robot, kid, monster, bird) with colours and moods
+- Shapes (rectangle, rounded, circle, triangle, star, heart, arrow, line) and eight cartoon characters
+  (cat, dog, kid, girl, robot, monster, bird, alien) with colours and moods
+- Six background scenes (meadow, city, night, sea, forest, room) added to every frame
+- Smooth movement: generate in-between frames with linear, ease or bounce timing
+- A sample animation on first launch
 - Select, move, rotate and scale with handles, or with two fingers; duplicate, flip, reorder, delete
 - Timeline with frame thumbnails: add, duplicate, delete and reorder frames, onion skin, loop, frame rate
 - Layers: add, rename, reorder, hide, lock, opacity, delete
@@ -37,10 +40,12 @@ node web/tests/e2e.cjs http://localhost:8765/  # end-to-end test in Chromium (ne
 
 | Folder | Contents |
 | --- | --- |
-| `js/core` | Project model, scene objects and geometry, store with undo/redo, player |
-| `js/render` | Canvas rendering of frames, shapes and characters |
+| `js/core` | Project model, scene objects and geometry, store with undo/redo, player, tweening, sample project |
+| `js/render` | Canvas rendering of frames, shapes, characters and background scenes |
 | `js/ui` | Components: stage, toolbar, timeline, layers, properties, insert sheet, context bar, project menu, export dialog |
 | `js/services` | Browser storage (IndexedDB) and video export (MediaRecorder) |
 | `sw.js`, `manifest.webmanifest` | Offline support and install metadata |
 
 When you change any file, bump `VERSION` in `sw.js` so installed apps pick up the update.
+
+The plan, the five team roles and the roadmap are in [docs/PLAN.md](docs/PLAN.md) (in Russian).

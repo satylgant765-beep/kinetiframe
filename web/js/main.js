@@ -1,6 +1,6 @@
 // Application entry point: restores the last project and wires the components together.
 
-import { createProject } from './core/project.js';
+import { createDemoProject } from './core/demo.js';
 import { Store } from './core/store.js';
 import { Player } from './core/player.js';
 import { Stage } from './ui/stage.js';
@@ -12,6 +12,7 @@ import { InsertSheet } from './ui/insert-sheet.js';
 import { ContextBar } from './ui/context-bar.js';
 import { ProjectMenu } from './ui/project-menu.js';
 import { ExportDialog } from './ui/export-dialog.js';
+import { TweenSheet } from './ui/tween-sheet.js';
 import { icon } from './ui/icons.js';
 import { toast } from './ui/toast.js';
 import { saveProject, loadProject, lastProjectId } from './services/storage.js';
@@ -25,7 +26,7 @@ async function restore() {
 }
 
 async function main() {
-  const project = (await restore()) || createProject();
+  const project = (await restore()) || createDemoProject();
   const store = new Store(project);
   const player = new Player(store);
 
@@ -36,7 +37,8 @@ async function main() {
   const exportDialog = new ExportDialog(store, $('export-dialog'));
   const projectMenu = new ProjectMenu(store, $('project-sheet'), { exportDialog });
   new Toolbar(store, $('toolbar'), { insertSheet: insertSheet.el, propsPanel: propsPanel.el, layersPanel: layersPanel.el });
-  new Timeline(store, $('timeline'), player);
+  const tweenSheet = new TweenSheet(store, $('tween-sheet'));
+  new Timeline(store, $('timeline'), player, { tweenSheet });
   new ContextBar(store, $('context-bar'));
 
   setupTopbar(store, projectMenu);

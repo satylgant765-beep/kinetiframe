@@ -256,7 +256,111 @@ function bird(ctx, color, mood) {
   outline(ctx, '#ffa94d');
 }
 
-const DRAWERS = { cat, robot, kid, monster, bird };
+function dog(ctx, color, mood) {
+  // Tail
+  ctx.beginPath();
+  ctx.moveTo(55, 60);
+  ctx.quadraticCurveTo(105, 40, 95, -5);
+  ctx.strokeStyle = INK; ctx.lineWidth = 20; ctx.lineCap = 'round'; ctx.stroke();
+  ctx.strokeStyle = color; ctx.lineWidth = 11; ctx.stroke();
+  // Body, legs
+  ctx.beginPath(); ctx.ellipse(0, 65, 65, 55, 0, 0, Math.PI * 2); outline(ctx, color);
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.roundRect(s * 38 - 14, 90, 28, 38, 12); outline(ctx, color);
+  }
+  ctx.beginPath(); ctx.ellipse(0, 70, 30, 35, 0, 0, Math.PI * 2); outline(ctx, '#fff4e6');
+  // Collar
+  ctx.beginPath(); ctx.roundRect(-40, 12, 80, 14, 7); outline(ctx, '#e03131');
+  circle(ctx, 0, 30, 8, '#ffd43b');
+  // Floppy ears behind the head
+  for (const s of [-1, 1]) {
+    ctx.beginPath();
+    ctx.ellipse(s * 70, -45, 22, 50, s * 0.35, 0, Math.PI * 2);
+    outline(ctx, '#8d5524');
+  }
+  // Head and muzzle
+  ctx.beginPath(); ctx.ellipse(0, -50, 70, 62, 0, 0, Math.PI * 2); outline(ctx, color);
+  ctx.beginPath(); ctx.ellipse(0, -18, 38, 26, 0, 0, Math.PI * 2); outline(ctx, '#fff4e6');
+  face(ctx, 0, -68, 28, 13, mood, 28);
+  ctx.beginPath(); ctx.ellipse(0, -30, 11, 8, 0, 0, Math.PI * 2); outline(ctx, INK);
+  if (mood === 'happy') {
+    ctx.beginPath(); ctx.ellipse(8, 2, 9, 12, 0, 0, Math.PI * 2); outline(ctx, '#ff8787');
+  }
+}
+
+function girl(ctx, color, mood) {
+  const skin = '#f1c27d';
+  const hair = '#2b1d14';
+  // Long hair behind
+  ctx.beginPath();
+  ctx.moveTo(-70, -60);
+  ctx.bezierCurveTo(-85, 20, -60, 40, -45, 30);
+  ctx.lineTo(45, 30);
+  ctx.bezierCurveTo(60, 40, 85, 20, 70, -60);
+  ctx.closePath();
+  outline(ctx, hair);
+  // Legs and shoes
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.roundRect(s * 20 - 9, 85, 18, 35, 6); outline(ctx, skin);
+    ctx.beginPath(); ctx.ellipse(s * 22, 122, 18, 9, 0, 0, Math.PI * 2); outline(ctx, '#7950f2');
+  }
+  // Arms
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.moveTo(s * 35, 15); ctx.lineTo(s * 70, 55);
+    ctx.strokeStyle = INK; ctx.lineWidth = 16; ctx.lineCap = 'round'; ctx.stroke();
+    ctx.strokeStyle = skin; ctx.lineWidth = 8; ctx.stroke();
+  }
+  // Dress
+  ctx.beginPath();
+  ctx.moveTo(-30, 0);
+  ctx.lineTo(30, 0);
+  ctx.lineTo(60, 92);
+  ctx.lineTo(-60, 92);
+  ctx.closePath();
+  outline(ctx, color);
+  // Head with fringe
+  circle(ctx, 0, -55, 58, skin);
+  ctx.beginPath();
+  ctx.moveTo(-60, -60);
+  ctx.bezierCurveTo(-60, -130, 60, -130, 60, -60);
+  ctx.bezierCurveTo(30, -80, -10, -75, -60, -60);
+  outline(ctx, hair);
+  // Bow
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.moveTo(40, -100); ctx.lineTo(40 + s * 24, -115); ctx.lineTo(40 + s * 24, -85); ctx.closePath();
+    outline(ctx, '#ff6b81');
+  }
+  circle(ctx, 40, -100, 7, '#ff6b81');
+  face(ctx, 0, -50, 22, 11, mood, 26);
+  ctx.globalAlpha *= 0.35;
+  circle(ctx, -36, -26, 7, '#ff8787');
+  circle(ctx, 36, -26, 7, '#ff8787');
+  ctx.globalAlpha /= 0.35;
+}
+
+function alien(ctx, color, mood) {
+  // Antennae
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.moveTo(s * 25, -85); ctx.quadraticCurveTo(s * 35, -115, s * 50, -118); outline(ctx, null);
+    circle(ctx, s * 52, -118, 9, '#ffd43b');
+  }
+  // Legs
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.roundRect(s * 25 - 10, 80, 20, 40, 8); outline(ctx, color);
+  }
+  // Space suit body
+  ctx.beginPath(); ctx.ellipse(0, 50, 55, 50, 0, 0, Math.PI * 2); outline(ctx, '#dee2e6');
+  ctx.beginPath(); ctx.roundRect(-22, 30, 44, 30, 6); outline(ctx, '#4dabf7');
+  // Big head
+  ctx.beginPath(); ctx.ellipse(0, -35, 85, 62, 0, 0, Math.PI * 2); outline(ctx, color);
+  // Three eyes
+  eye(ctx, -40, -45, 15, mood, -1);
+  eye(ctx, 40, -45, 15, mood, 1);
+  eye(ctx, 0, -62, 12, mood, 1);
+  mouth(ctx, 0, -8, 34, mood);
+}
+
+const DRAWERS = { cat, robot, kid, monster, bird, dog, girl, alien };
 
 export function drawCharacter(ctx, obj) {
   const draw = DRAWERS[obj.kind] || cat;
