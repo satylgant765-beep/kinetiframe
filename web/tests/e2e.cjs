@@ -6,8 +6,8 @@ const url = process.argv[2] || 'http://localhost:8765/';
 const shots = process.argv[3];
 
 (async () => {
-  const browser = await chromium.launch();
-  const context = await browser.newContext({ ...devices['Pixel 7'], acceptDownloads: true });
+  const browser = await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--autoplay-policy=no-user-gesture-required'] });
+  const context = await browser.newContext({ ...devices['Pixel 7'], acceptDownloads: true, permissions: ['microphone'] });
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -294,6 +294,59 @@ const shots = process.argv[3];
     assert.equal(await page.evaluate(() => window.tas.store.project.frames.length), 7);
   });
 
+  await step('sound: file, microphone, Azure voice, timing', async () => {
+    const path = require('path');
+    await page.click('.timeline [data-act="sound"]');
+    await page.waitForTimeout(300);
+    await page.setInputFiles('#sound-sheet [data-file]', path.join(__dirname, 'beep.wav'));
+    await page.waitForFunction(() => (window.tas.store.project.audio || []).length === 1);
+    await page.waitForSelector('.frame-thumb.has-sound');
+    assert.equal(await page.locator('.frame-thumb.has-sound').count(), 1);
+    await page.fill('#sound-sheet [data-clip] [data-start]', '3');
+    await page.locator('#sound-sheet [data-clip] [data-start]').dispatchEvent('change');
+    assert.equal(await page.evaluate(() => window.tas.store.project.audio[0].startFrame), 2);
+
+    // Microphone (Chromium's fake device).
+    await page.click('#sound-sheet [data-act="record"]');
+    await page.waitForTimeout(1200);
+    await page.click('#sound-sheet [data-act="record"]');
+    await page.waitForFunction(() => window.tas.store.project.audio.length === 2, null, { timeout: 5000 });
+
+    // Azure: without a key the user gets a clear message.
+    await page.fill('#sound-sheet [data-tts-text]', 'Сәлем!');
+    await page.click('#sound-sheet [data-act="tts"]');
+    await page.waitForSelector('.toast--visible.toast--error');
+    // With a key, the request goes to the region endpoint with the voice in SSML.
+    let request;
+    await page.route('https://westeurope.tts.speech.microsoft.com/**', async (route) => {
+      request = route.request();
+      await route.fulfill({ status: 200, contentType: 'audio/wav', body: require('fs').readFileSync(path.join(__dirname, 'beep.wav')) });
+    });
+    await page.fill('#sound-sheet [data-azure-key]', 'test-key');
+    await page.fill('#sound-sheet [data-azure-region]', 'WestEurope');
+    await page.click('#sound-sheet [data-act="save-azure"]');
+    await page.selectOption('#sound-sheet [data-tts-voice]', 'kk-KZ-AigulNeural');
+    await page.selectOption('#sound-sheet [data-tts-style]', 'cartoon');
+    await page.click('#sound-sheet [data-act="tts"]');
+    await page.waitForFunction(() => window.tas.store.project.audio.length === 3, null, { timeout: 5000 });
+    assert.equal(request.headers()['ocp-apim-subscription-key'], 'test-key');
+    assert.ok(request.postData().includes('kk-KZ-AigulNeural') && request.postData().includes('+35%'));
+    assert.ok(!JSON.stringify(await page.evaluate(() => window.tas.store.project)).includes('test-key'), 'key never stored in project');
+    await shot('09a-sound');
+
+    // Delete one clip, undo brings it back.
+    await page.click('#sound-sheet [data-clip]:last-child [data-act="delete-clip"]');
+    assert.equal(await page.evaluate(() => window.tas.store.project.audio.length), 2);
+    await page.click('#sound-sheet [data-act="close"]');
+    await page.click('#undo-btn');
+    assert.equal(await page.evaluate(() => window.tas.store.project.audio.length), 3);
+
+    // Playback with sound runs without errors.
+    await page.click('.timeline [data-act="play"]');
+    await page.waitForTimeout(800);
+    await page.click('.timeline [data-act="play"]');
+  });
+
   await step('export video', async () => {
     await page.click('#menu-btn');
     await page.waitForTimeout(300);
@@ -306,8 +359,11 @@ const shots = process.argv[3];
     const [download] = await Promise.all([page.waitForEvent('download'), page.click('#export-dialog [data-act="download"]')]);
     const fs = require('fs');
     const size = fs.statSync(await download.path()).size;
-    console.log('   video', download.suggestedFilename(), await page.evaluate(() => window.tas.store.project.name), size, 'bytes');
+    const buf = fs.readFileSync(await download.path());
+    console.log('   video', size, 'bytes, audio track:', buf.includes('soun') || buf.includes('A_OPUS'));
+    assert.ok(buf.includes('soun') || buf.includes('A_OPUS'), 'video has a sound track');
     assert.ok(size > 1000);
+    assert.match(await page.locator('#export-dialog [data-info]').innerText(), /со звуком/);
     await page.click('#export-dialog [data-act="cancel"]');
   });
 

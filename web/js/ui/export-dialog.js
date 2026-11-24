@@ -55,7 +55,7 @@ export class ExportDialog {
   open() {
     const { project } = this.store;
     const seconds = project.frames.length / project.fps;
-    const support = videoSupport();
+    const support = videoSupport((project.audio || []).length > 0) || videoSupport();
     this.result = null;
     this.q('[data-setup]').hidden = false;
     this.q('[data-progress]').hidden = true;
@@ -64,7 +64,7 @@ export class ExportDialog {
     this.q('[data-act="share"]').hidden = true;
     this.q('[data-act="cancel"]').textContent = 'Закрыть';
     this.q('[data-info]').textContent = `${project.frames.length} кадр., ${project.fps} к/с — ${seconds.toFixed(1)} с за один проход. `
-      + `Формат: ${support ? support.ext.toUpperCase() : 'нет'}. Запись идёт в реальном времени, не закрывайте вкладку.`;
+      + `Формат: ${support ? support.ext.toUpperCase() : 'нет'}${(project.audio || []).length ? ', со звуком' : ''}. Запись идёт в реальном времени, не закрывайте вкладку.`;
     this.store.setUI({ playing: false });
     openSheet(this.el);
   }

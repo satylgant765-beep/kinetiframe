@@ -1,6 +1,6 @@
 // Offline support: serve the app shell from the cache, update it in the background.
 // Bump VERSION whenever files change so phones pick up the new release.
-const VERSION = 'tas-v2';
+const VERSION = 'tas-v3';
 const SHELL = [
   './',
   './index.html',
@@ -22,6 +22,8 @@ const SHELL = [
   './js/render/scenes.js',
   './js/services/storage.js',
   './js/services/video-export.js',
+  './js/services/audio.js',
+  './js/services/azure-tts.js',
   './js/ui/icons.js',
   './js/ui/toast.js',
   './js/ui/sheets.js',
@@ -35,6 +37,7 @@ const SHELL = [
   './js/ui/project-menu.js',
   './js/ui/export-dialog.js',
   './js/ui/tween-sheet.js',
+  './js/ui/sound-sheet.js',
 ];
 
 self.addEventListener('install', (event) => {

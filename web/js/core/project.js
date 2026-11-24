@@ -40,6 +40,7 @@ export function createProject({ name = 'Мой мультфильм', aspect = '
     background,
     layers,
     frames: [createFrame(layers)],
+    audio: [],
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -158,6 +159,15 @@ export function deserialize(text) {
     frame.cells = frame.cells || {};
     for (const layer of data.layers) if (!Array.isArray(frame.cells[layer.id])) frame.cells[layer.id] = [];
   }
+  data.audio = (Array.isArray(data.audio) ? data.audio : [])
+    .filter((c) => c && typeof c.src === 'string' && c.src.startsWith('data:audio/'))
+    .map((c) => ({
+      ...c,
+      name: String(c.name || 'Звук'),
+      startFrame: clampNumber(c.startFrame, 0, data.frames.length - 1, 0),
+      volume: clampNumber(c.volume, 0, 2, 1),
+      duration: clampNumber(c.duration, 0, 36000, 0),
+    }));
   data.fps = clampNumber(data.fps, 1, 60, 12);
   data.width = clampNumber(data.width, 64, 4096, 1280);
   data.height = clampNumber(data.height, 64, 4096, 720);

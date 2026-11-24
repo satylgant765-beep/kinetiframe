@@ -1,4 +1,6 @@
-// Plays frames at the project's frame rate by advancing ui.frameIndex.
+// Plays frames at the project's frame rate by advancing ui.frameIndex, with the project's sound.
+
+import { playFrom, stopAll } from '../services/audio.js';
 
 export class Player {
   constructor(store) {
@@ -21,6 +23,7 @@ export class Player {
       return;
     }
     if (!ui.loop && ui.frameIndex >= project.frames.length - 1) this.store.setUI({ frameIndex: 0 });
+    playFrom(project, this.store.ui.frameIndex).catch(() => {});
     let last = performance.now();
     const tick = (now) => {
       if (!this.store.ui.playing) return;
@@ -38,11 +41,15 @@ export class Player {
     const { project, ui } = this.store;
     const next = ui.frameIndex + 1;
     if (next < project.frames.length) this.store.setUI({ frameIndex: next });
-    else if (ui.loop) this.store.setUI({ frameIndex: 0 });
+    else if (ui.loop) {
+      this.store.setUI({ frameIndex: 0 });
+      playFrom(project, 0).catch(() => {});
+    }
     else this.store.setUI({ playing: false });
   }
 
   stop() {
     cancelAnimationFrame(this.raf);
+    stopAll();
   }
 }

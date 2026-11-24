@@ -11,6 +11,8 @@ It is a separate web project inside this repository and does not touch the Andro
 - Six background scenes (meadow, city, night, sea, forest, room) added to every frame
 - Smooth movement: generate in-between frames with linear, ease or bounce timing
 - A sample animation on first launch
+- Sound: audio files, microphone recording and character voices from text via Azure AI Speech
+  (key stays in the browser), played with the animation and mixed into the exported video
 - Select, move, rotate and scale with handles, or with two fingers; duplicate, flip, reorder, delete
 - Timeline with frame thumbnails: add, duplicate, delete and reorder frames, onion skin, loop, frame rate
 - Layers: add, rename, reorder, hide, lock, opacity, delete

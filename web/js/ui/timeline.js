@@ -8,8 +8,9 @@ const FPS_OPTIONS = [4, 6, 8, 12, 15, 24, 30];
 const THUMB_HEIGHT = 52;
 
 export class Timeline {
-  constructor(store, el, player, { tweenSheet } = {}) {
+  constructor(store, el, player, { tweenSheet, soundSheet } = {}) {
     this.tweenSheet = tweenSheet;
+    this.soundSheet = soundSheet;
     this.store = store;
     this.el = el;
     this.player = player;
@@ -33,6 +34,7 @@ export class Timeline {
         </div>
         <div class="timeline__group">
           <button class="icon-btn" data-act="onion" aria-pressed="false" title="Калька: показать предыдущий кадр">${icon('onion')}</button>
+          <button class="icon-btn" data-act="sound" title="Звук и голоса">${icon('music')}</button>
           <button class="icon-btn" data-act="loop" aria-pressed="false" title="Повтор">${icon('loop')}</button>
           <label class="fps" title="Кадров в секунду">
             <select data-fps aria-label="Кадров в секунду">
@@ -97,6 +99,7 @@ export class Timeline {
       case 'left': frameOp((p) => moveFrame(p, i, -1)); break;
       case 'right': frameOp((p) => moveFrame(p, i, 1)); break;
       case 'tween': this.tweenSheet?.open(); break;
+      case 'sound': this.soundSheet?.open(); break;
       case 'onion': store.setUI({ onion: !store.ui.onion }); break;
       case 'loop': store.setUI({ loop: !store.ui.loop }); break;
       default:
@@ -154,6 +157,10 @@ export class Timeline {
       renderFrame(canvas.getContext('2d'), project, i, (width * dpr) / project.width);
     });
     for (const extra of existing.slice(project.frames.length)) extra.remove();
+    const starts = new Set((project.audio || []).map((c) => c.startFrame));
+    for (const item of this.framesEl.children) {
+      item.classList.toggle('has-sound', starts.has(Number(item.dataset.frame)));
+    }
     this.highlight();
   }
 

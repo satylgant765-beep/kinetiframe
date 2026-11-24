@@ -13,6 +13,7 @@ import { ContextBar } from './ui/context-bar.js';
 import { ProjectMenu } from './ui/project-menu.js';
 import { ExportDialog } from './ui/export-dialog.js';
 import { TweenSheet } from './ui/tween-sheet.js';
+import { SoundSheet } from './ui/sound-sheet.js';
 import { icon } from './ui/icons.js';
 import { toast } from './ui/toast.js';
 import { saveProject, loadProject, lastProjectId } from './services/storage.js';
@@ -38,7 +39,8 @@ async function main() {
   const projectMenu = new ProjectMenu(store, $('project-sheet'), { exportDialog });
   new Toolbar(store, $('toolbar'), { insertSheet: insertSheet.el, propsPanel: propsPanel.el, layersPanel: layersPanel.el });
   const tweenSheet = new TweenSheet(store, $('tween-sheet'));
-  new Timeline(store, $('timeline'), player, { tweenSheet });
+  const soundSheet = new SoundSheet(store, $('sound-sheet'));
+  new Timeline(store, $('timeline'), player, { tweenSheet, soundSheet });
   new ContextBar(store, $('context-bar'));
 
   setupTopbar(store, projectMenu);

@@ -45,6 +45,8 @@ const paths = {
   file: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/>',
   install: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 8v7M9 12l3 3 3-3"/>',
   share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-3.8M8.2 13l7.6 3.8"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  mic: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v4M8 22h8"/>',
   tween: '<circle cx="5" cy="17" r="2.5"/><circle cx="19" cy="7" r="2.5"/><path d="M7 15.5C10 14 9 9 12 9s3 0 4.5-1" stroke-dasharray="2 2.5"/>',
   reset: '<path d="M4 12a8 8 0 108-8H8"/><path d="M11 1L8 4l3 3"/>',
 };

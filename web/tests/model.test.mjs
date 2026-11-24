@@ -125,3 +125,20 @@ test('sample project is valid and round-trips', () => {
   const back = deserialize(serialize(demo));
   assert.equal(back.frames.length, 21);
 });
+
+test('sound clips are validated when a project is opened', async () => {
+  const { buildSsml } = await import('../js/services/azure-tts.js');
+  const p = createProject();
+  p.audio = [
+    { id: 'a', name: 'ok', src: 'data:audio/wav;base64,AAAA', startFrame: 99, volume: 5, duration: 1 },
+    { id: 'b', name: 'bad', src: 'https://example.com/x.mp3', startFrame: 0, volume: 1, duration: 1 },
+  ];
+  const back = deserialize(serialize(p));
+  assert.equal(back.audio.length, 1, 'only embedded audio is kept');
+  assert.equal(back.audio[0].startFrame, 0, 'start frame clamped to the project');
+  assert.equal(back.audio[0].volume, 2);
+  const old = deserialize(serialize({ ...createProject(), audio: undefined }));
+  assert.deepEqual(old.audio, [], 'projects from v1 open with no sound');
+  const ssml = buildSsml('<Сәлем & hi>', 'kk-KZ-AigulNeural', 'giant');
+  assert.ok(ssml.includes('xml:lang="kk-KZ"') && ssml.includes('&lt;Сәлем &amp; hi&gt;') && ssml.includes('pitch="-35%"'));
+});
